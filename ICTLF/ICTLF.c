@@ -1,5 +1,4 @@
 #include <stdio.h>
-
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
@@ -18,9 +17,9 @@
 #define J 0.3
 #define h 0.6
 
-complex E[2][2] = {{1+I*0, 0}, {0, 1+I*0}};
+complex E[2][2] = {{1, 0}, {0, 1}};
 complex SIGMA_1[2][2] = {{0, 1}, {1, 0}};
-complex SIGMA_2[2][2] = {{0, -I*1}, {I*1, 0}};
+complex SIGMA_2[2][2] = {{0, -1.0i}, {1.0i, 0}};
 complex SIGMA_3[2][2] = {{1, 0}, {0, -1}};
 complex SPIN_UP[2] = {1, 0};
 complex SPIN_DOWN[2] = {0, 1};
@@ -29,6 +28,7 @@ const E_INITIAL = 0;
 
 
 
+complex *ms(complex *M, complex s, int m); // 数组与标量乘法
 complex *kronecker(complex *LM, complex *RM, int l, int r); // 两个数组作张量积
 
 
@@ -39,9 +39,9 @@ int main()
 	// 构造局域化算符
 	complex *L_OPERATOR; 
 	complex *L_ANXULIARY;
-	complex *HAMILTONIAN = 0;
-	complex *HAMILTONIAN_TRANS = 0;
-	complex *HAMILTONIAN_LONGI = 0;
+	complex *HAMILTONIAN = NULL;
+	complex *HAMILTONIAN_TRANS = NULL;
+	complex *HAMILTONIAN_LONGI = NULL;
 	int i;
 	int j;
 	for (i = 0; i < N + 1; i++){
@@ -85,45 +85,61 @@ int main()
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	clock_t end = clock();
 	time_comsume = (double)(end - start) / CLOCK_PER_SECOND;
 	printf("time comsuming: %.2f \n", time_comsume);
 
 	return 0;
 }
+
+
+
+complex *ms(complex *M, complex s, int m){
+	int i;
+	int j;
+	complex **OUT = calloc(m, sizeof(complex *));
+	for (i = 0; i < m; i++){
+		OUT[i] = calloc(m, sizeof(complex));
+	}
+	for (i = 0; i < m; i++){
+		for (j = 0; j < m; j++){
+			OUT[i][j] = M[i][j] * s;
+		}
+	}
+	return OUT;
+}
+
+
+
+complex *kronecker(complex *LM, complex *RM, int l, int r){
+	int i; 
+	int j;
+	int jj;
+	complex **PM = calloc(l * r, sizeof(complex *));
+	for (i = 0; i < l * r; i++){
+		PM[i] = calloc(l * r, sizeof(complex));
+	}
+	for (i = 0; i < l; i++){
+		for (j = 0; j < l; j++){
+			complex *LIJ = ms(RM, LM[i][j], r);
+			for (jj = 0; jj < r; jj++){
+				memcpy(*(PM + (i * r + jj)) + (j * r), LIJ[jj], sizeof(complex) * r);
+			}
+		}
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
