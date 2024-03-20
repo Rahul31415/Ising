@@ -30,6 +30,10 @@ const E_INITIAL = 0;
 
 complex *ms(complex *M, complex s, int m); // 数组与标量乘法
 complex *kronecker(complex *LM, complex *RM, int l, int r); // 两个数组作张量积
+int VectorToNumber(int *A, int m);
+int *NumberToVector(int n);
+int *Cycle(int *B);
+
 
 
 
@@ -79,6 +83,45 @@ int main()
 	*HAMILTONIAN += J * N * L_OPERATOR;
 
 	// 构造反铁磁态
+	complex Z2[2] = SPIN_DOWN;
+
+	for (i = 0; i < N + 1; i++){
+		if (i % 2 == 0){
+			Z2 = kronecker(Z2, SPIN_DOWN);
+		}
+		else{
+			Z2 = kronecker(Z2, SPIN_UP);
+		}
+	}
+
+	// 构造对应函数
+	int corresponding[M] = {0};
+
+	for (i = 0; i < M; i++){
+		corresponding[i] = i;
+	}
+
+	for (i = 0; i < M; i++){
+		int *vector = NumberToVector(i);
+		int n = sizeof(vector)/sizeof(vector[0]);
+		int *vectori = calloc(n, sizeof(int));
+		memcpy(vetori[0], vector[0], sizeof(int) * n);
+		vector = Cycle(vectori);
+		corresponding[i] = VectorToNumber(vector);
+	}
+
+
+	// 寻找代表态
+	struct dict{
+		int key;
+		int value;
+
+
+
+
+	
+
+
 	
 
 	
