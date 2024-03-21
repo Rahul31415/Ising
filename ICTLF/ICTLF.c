@@ -33,7 +33,7 @@ complex *kronecker(complex *LM, complex *RM, int l, int r); // 两个数组作�
 int VectorToNumber(int *A, int m);
 int *NumberToVector(int n);
 int *Cycle(int *B);
-
+complex (*MS) (complex *M, complex s, int m) = ms;
 
 
 
@@ -115,6 +115,7 @@ int main()
 	struct dict{
 		int key;
 		int value;
+	}
 
 
 
@@ -137,39 +138,43 @@ int main()
 
 
 
-complex *ms(complex *M, complex s, int m){
+complex *ms(complex *M, complex s, int m, int n){
 	int i;
 	int j;
-	complex **OUT = calloc(m, sizeof(complex *));
+	static complex **OUT = calloc(m, sizeof(complex *));
 	for (i = 0; i < m; i++){
-		OUT[i] = calloc(m, sizeof(complex));
+		OUT[i] = calloc(n, sizeof(complex));
 	}
 	for (i = 0; i < m; i++){
-		for (j = 0; j < m; j++){
+		for (j = 0; j < n; j++){
 			OUT[i][j] = M[i][j] * s;
 		}
 	}
+
 	return OUT;
 }
 
 
 
-complex *kronecker(complex *LM, complex *RM, int l, int r){
+complex *kronecker(complex *LM, complex *RM, int lr, int lc, int rr, int rc){
 	int i; 
 	int j;
 	int jj;
-	complex **PM = calloc(l * r, sizeof(complex *));
-	for (i = 0; i < l * r; i++){
-		PM[i] = calloc(l * r, sizeof(complex));
+	complex *LIJ;
+	static complex **PM = calloc(lr * rr, sizeof(complex *));
+	for (i = 0; i < lr * rr; i++){
+		PM[i] = calloc(lc * rc, sizeof(complex));
 	}
-	for (i = 0; i < l; i++){
-		for (j = 0; j < l; j++){
-			complex *LIJ = ms(RM, LM[i][j], r);
-			for (jj = 0; jj < r; jj++){
-				memcpy(*(PM + (i * r + jj)) + (j * r), LIJ[jj], sizeof(complex) * r);
+	for (i = 0; i < lr; i++){
+		for (j = 0; j < lc; j++){
+			LIJ = MS(RM, LM[i][j], rr, rc);
+			for (jj = 0; jj < rr; jj++){
+				memcpy(*(PM + (i * lr + jj)) + (j * rc), LIJ[jj], sizeof(complex) * rc);
 			}
 		}
 	}
+
+	return PM;
 }
 
 
